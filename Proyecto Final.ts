@@ -1,30 +1,161 @@
+//Marlon
+import {Usuario} from './interfaces/usuario.interface'
 
-import * as fs from 'fs';
-import * as path from 'path';
 
-// Definir tipos de datos
+let Usuarios: Usuario[] = []
+
+//Marlon
+function agregarUsuario(id_usuario: number, nombre: string, carnet: number, correo: string, clave: string, habilitado: boolean): void {
+    const nuevoUsuario: Usuario = { id_usuario, nombre, carnet, correo, clave, habilitado: true }
+    Usuarios.push(nuevoUsuario)
+    console.log(`Usuario agregado: ${nombre}`)
+}
+
+function autenticarUsuario(correo: string, clave: string): Usuario | null {
+    const usuario = Usuarios.find(u => u.correo === correo && u.clave === clave)
+    if (usuario) {
+        console.log(`Usuario autenticado: ${usuario.nombre}`)
+        return usuario
+    } else {
+        console.log('Correo o clave incorrectos.')
+        return null
+    }
+}
+
+function deshabilitarUsuario(id_usuario: number): void {
+    const usuarioIndex = Usuarios.findIndex(u => u.id_usuario === id_usuario)
+    if (usuarioIndex !== -1) {
+        Usuarios[usuarioIndex].habilitado = false
+        console.log(`Usuario deshabilitado: ${Usuarios[usuarioIndex].nombre}`)
+    } else {
+        console.log(`No se encontró un usuario con ID ${id_usuario}`)
+    }
+}
+
+function editarUsuario(id_usuario: number, nuevoUsuario: Partial<Usuario>): void {
+    const usuarioN = Usuarios.findIndex(u => u.id_usuario === id_usuario)
+    if (usuarioN !== -1) {
+        Usuarios[usuarioN] = { ...Usuarios[usuarioN], ...nuevoUsuario }
+        console.log(`Usuario editado: ${Usuarios[usuarioN].nombre}`)
+    } else {
+        console.log(`No se encontró un usuario con ID ${id_usuario}`)
+    }
+}
+
+// Aca se cambian los valores para controlar los usuarios
+agregarUsuario(1, "Juan Perez", 201912345, "juanperez@example.com", "Ju4N,P$R3z*", false)
+agregarUsuario(2, "Pedro Lopez", 201922222, "pedrolopez@example.com", "p3DR,0LoPe7*", true)
+autenticarUsuario("juanperez@example.com", "Ju4N,P$R3z*") 
+//editarUsuario(1, { nombre: "Pedro Perez",carnet: 123456, correo: "@example.com", clave: "abc123" })
+deshabilitarUsuario(0) // del 1 al 2
+
+console.log("Datos del usuario:", Usuarios)
+
+
+//Valery 
+
+
+import {Paciente} from "./interfaces/paciente.interface";
+
+let Paciente: Paciente[] = [];
+
+function agregarPaciente(id_paciente: number, nombre: string, fecha_nacimiento: string, direccion: string, telefono: string): void {
+    const nuevoPaciente: Paciente = { id_paciente, nombre, fecha_nacimiento, direccion, telefono}
+    Paciente.push(nuevoPaciente)
+    console.log(`Paciente agregado: ${nombre}`)
+}
+
+agregarPaciente(1, "Valery Gomez", "2001-12-03", "Ciudad de Guatemala", "45018741",)
+agregarPaciente(2, "Jonathan Soberanis", "2000-10-20", "San Cristobal", "51849562",)
+
+console.log("Datos del Paciente:",Paciente)
+
+//Obtener Paciente por ID 
+
+function obtenerPacientePorId(id_paciente: number): Paciente | undefined {
+    return Paciente.find(paciente => paciente.id_paciente === id_paciente);
+}
+
+const paciente = obtenerPacientePorId(1);
+if (paciente) {
+    console.log(`Paciente encontrado: ${paciente.nombre}`);
+} else {
+    console.log('Paciente no encontrado');
+}
+
+
+// Contar pacientes 
+
+function contarPacientes(): number {
+    return Paciente.length;
+}
+
+const numeroDePacientes = contarPacientes();
+console.log(`Número de pacientes registrados: ${numeroDePacientes}`);
+
+
+
+//Jonathan
+// Definición de la interfaz Cita
+interface Cita {
+    id_cita: number;
+    id_paciente: number;
+    id_doctor: number;
+    fecha_hora: Date;
+  }
+  
+  // Clase de Gestión de Citas
+  class GestorDeCitas {
+    private citas: Cita[] = []; // Inicializar citas como un array vacío
+  
+    // Programar cita
+    public programarCita(id_paciente: number, id_doctor: number, fecha_hora: Date): Cita {
+      const id_cita = this.citas.length > 0 ? this.citas[this.citas.length - 1].id_cita + 1 : 1; // Generar un nuevo ID de cita
+      const nuevaCita: Cita = {
+        id_cita,
+        id_paciente,
+        id_doctor,
+        fecha_hora
+      };
+      this.citas.push(nuevaCita); // Agregar cita al array de citas
+      return nuevaCita;
+    }
+  
+    // Cancelar cita
+    public cancelarCita(id_cita: number): void {
+      const index = this.citas.findIndex(cita => cita.id_cita === id_cita); // Buscar cita por ID de cita
+      if (index !== -1) {
+        this.citas.splice(index, 1); // Eliminar cita del array
+      }
+    }
+  
+    // Reprogramar cita
+    public reprogramarCita(id_cita: number, nuevaFechaHora: Date): void {
+      const cita = this.citas.find(cita => cita.id_cita === id_cita); // Buscar cita por ID de cita
+      if (cita) {
+        cita.fecha_hora = nuevaFechaHora; // Actualizar fecha y hora de la cita
+      }
+    }
+  
+    // Obtener citas de un doctor
+    public obtenerCitasDeDoctor(id_doctor: number): Cita[] {
+      return this.citas.filter(cita => cita.id_doctor === id_doctor); // Filtrar citas por ID de doctor
+    }
+  
+    // Obtener citas de un paciente
+    public obtenerCitasDePaciente(id_paciente: number): Cita[] {
+      return this.citas.filter(cita => cita.id_paciente === id_paciente); // Filtrar citas por ID de paciente
+    }
+  
+    // Obtener citas por fecha
+    public obtenerCitasPorFecha(fecha: Date): Cita[] {
+      return this.citas.filter(cita => cita.fecha_hora.toDateString() === fecha.toDateString()); // Filtrar citas por fecha
+    }
+  }
+  
+//Luis Borrayo
+// Definiciones de interfaces
 type ID = number;
-
-// Interfaces
-interface Usuario {
-    id_usuario: ID;
-    nombre: string;
-    carnet: number;
-    correo: string;
-    clave: string;
-    habilitado: boolean;
-}
-
-interface Paciente {
-    id_paciente: ID;
-    nombre: string;
-    fecha_nacimiento: Date;
-    direccion: string;
-    telefono: number;
-    alergias: string[];
-    medicamentos_actuales: string[];
-    condiciones_medicas: string[];
-}
 
 interface Horario {
     dia: 'Lunes' | 'Martes' | 'Miércoles' | 'Jueves' | 'Viernes' | 'Sábado' | 'Domingo';
@@ -39,372 +170,271 @@ interface Doctor {
     horario: Horario[];
 }
 
-interface Cita {
-    fecha_hora: Date;
-    id_paciente: ID;
-    id_doctor: ID;
-}
+class Clinic {
+    private doctors: Doctor[] = [];
 
-interface Medicamento {
-    nombre: string;
-    dosis: string;
-    frecuencia_horas: number;
-    duracion_dias: number;
-}
-
-interface Receta {
-    id_paciente: ID;
-    id_doctor: ID;
-    medicamentos: Medicamento[];
-}
-
-interface ProductoServicio {
-    id_producto_servicio: ID;
-    tipo: 'Servicio' | 'Producto';
-    nombre: string;
-    precio: number;
-}
-
-interface Factura {
-    id_factura: ID;
-    fecha_hora: Date;
-    id_paciente: ID;
-    id_doctor: ID;
-    servicios_consumidos: ID[];
-    total: number;
-}
-
-// Funciones auxiliares para manejar datos
-function cargarDatos<T>(nombreArchivo: string): T[] {
-    const ruta = path.join(__dirname, 'data', `${nombreArchivo}.json`);
-    if (fs.existsSync(ruta)) {
-        const datos = fs.readFileSync(ruta, 'utf-8');
-        return JSON.parse(datos) as T[];
-    }
-    return [];
-}
-
-function guardarDatos<T>(nombreArchivo: string, datos: T[]): void {
-    const directorio = path.join(__dirname, 'data');
-    const ruta = path.join(directorio, `${nombreArchivo}.json`);
-
-    // Verificar si el directorio 'data' existe, si no, crearlo
-    if (!fs.existsSync(directorio)) {
-        fs.mkdirSync(directorio, { recursive: true });
+    agregarDoctor(doctor: Doctor): void {
+        this.doctors.push(doctor);
     }
 
-    // Guardar los datos en el archivo JSON
-    fs.writeFileSync(ruta, JSON.stringify(datos, null, 2));
-}
+    editarDoctor(id_doctor: ID, updatedDoctor: Partial<Doctor>): void {
+        const doctor = this.buscarDoctorPorId(id_doctor);
+        if (doctor) {
+            Object.assign(doctor, updatedDoctor);
+        } else {
+            console.log(`Doctor con ID ${id_doctor} no encontrado.`);
+        }
+    }
 
-// Gestión de Usuarios
-function crearUsuario(usuario: Usuario): void {
-    const usuarios = cargarDatos<Usuario>('usuarios');
-    usuarios.push(usuario);
-    guardarDatos('usuarios', usuarios);
-}
+    eliminarDoctor(id_doctor: ID): void {
+        this.doctors = this.doctors.filter(doc => doc.id_doctor !== id_doctor);
+    }
 
-function editarUsuario(id: ID, usuarioActualizado: Partial<Usuario>): void {
-    const usuarios = cargarDatos<Usuario>('usuarios');
-    const indice = usuarios.findIndex(u => u.id_usuario === id);
-    if (indice !== -1) {
-        usuarios[indice] = { ...usuarios[indice], ...usuarioActualizado };
-        guardarDatos('usuarios', usuarios);
+    buscarDoctorPorId(id_doctor: ID): Doctor | undefined {
+        return this.doctors.find(doc => doc.id_doctor === id_doctor);
+    }
+
+    obtenerDoctoresDisponiblesPorDia(dia: string): Doctor[] {
+        return this.doctors.filter(doctor =>
+            doctor.horario.some((schedule: Horario) => schedule.dia === dia)
+        );
+    }
+
+    obtenerTodosLosDoctores(): Doctor[] {
+        return this.doctors;
+    }
+
+    contarDoctores(): number {
+        return this.doctors.length;
+    }
+
+    validarDisponibilidadDoctor(id_doctor: ID, dia: string, hora: string): boolean {
+        const doctor = this.buscarDoctorPorId(id_doctor);
+        if (doctor) {
+            return doctor.horario.some((schedule: Horario) =>
+                schedule.dia === dia &&
+                schedule.hora_inicio <= hora &&
+                schedule.hora_fin >= hora
+            );
+        } else {
+            console.log(`Doctor con ID ${id_doctor} no encontrado.`);
+            return false;
+        }
     }
 }
 
-function deshabilitarUsuario(id: ID): void {
-    const usuarios = cargarDatos<Usuario>('usuarios');
-    const indice = usuarios.findIndex(u => u.id_usuario === id);
-    if (indice !== -1) {
-        usuarios[indice].habilitado = false;
-        guardarDatos('usuarios', usuarios);
-    }
-}
+const clinic = new Clinic();
 
-function autenticarUsuario(correo: string, clave: string): Usuario | undefined {
-    const usuarios = cargarDatos<Usuario>('usuarios');
-    return usuarios.find(u => u.correo === correo && u.clave === clave && u.habilitado);
-}
+const doctor1: Doctor = {
+    id_doctor: 1,
+    nombre: 'María García',
+    especialidad: 'Odontología',
+    horario: [
+        { dia: 'Lunes', hora_inicio: '08:00', hora_fin: '12:00' },
+        { dia: 'Miércoles', hora_inicio: '14:00', hora_fin: '18:00' },
+        { dia: 'Viernes', hora_inicio: '10:00', hora_fin: '14:00' }
+    ]
+};
 
-function desautenticarUsuario(): void {
-    // Implementación específica de desautenticación
-}
+const doctor2: Doctor = {
+    id_doctor: 2,
+    nombre: 'Dr. Carla Pérez',
+    especialidad: 'Odontología',
+    horario: [
+        { dia: 'Lunes', hora_inicio: '08:00', hora_fin: '17:00' },
+        { dia: 'Miércoles', hora_inicio: '08:00', hora_fin: '12:00' }
+    ]
+};
 
-// Gestión de Pacientes
-function crearPaciente(paciente: Paciente): void {
-    const pacientes = cargarDatos<Paciente>('pacientes');
-    pacientes.push(paciente);
-    guardarDatos('pacientes', pacientes);
-}
+const doctor3: Doctor = {
+    id_doctor: 3,
+    nombre: 'Dra. Ana Gómez',
+    especialidad: 'Odontología',
+    horario: [
+        { dia: 'Miércoles', hora_inicio: '12:00', hora_fin: '17:00' },
+        { dia: 'Viernes', hora_inicio: '08:00', hora_fin: '17:00' }
+    ]
+};
 
-function editarPaciente(id: ID, pacienteActualizado: Partial<Paciente>): void {
-    const pacientes = cargarDatos<Paciente>('pacientes');
-    const indice = pacientes.findIndex(p => p.id_paciente === id);
-    if (indice !== -1) {
-        pacientes[indice] = { ...pacientes[indice], ...pacienteActualizado };
-        guardarDatos('pacientes', pacientes);
-    }
-}
+const doctor4: Doctor = {
+    id_doctor: 4,
+    nombre: 'Dr. Mario Sanchez',
+    especialidad: 'Cirujano Oral',
+    horario: [
+        { dia: 'Lunes', hora_inicio: '08:00', hora_fin: '17:00' },
+        { dia: 'Jueves', hora_inicio: '08:00', hora_fin: '17:00' }
+    ]
+};
 
-function eliminarPaciente(id: ID): void {
-    const pacientes = cargarDatos<Paciente>('pacientes');
-    const indice = pacientes.findIndex(p => p.id_paciente === id);
-    if (indice !== -1) {
-        pacientes.splice(indice, 1);
-        guardarDatos('pacientes', pacientes);
-    }
-}
+clinic.agregarDoctor(doctor1);
+clinic.agregarDoctor(doctor2);
+clinic.agregarDoctor(doctor3);
+clinic.agregarDoctor(doctor4);
 
-function obtenerPacientePorId(id: ID): Paciente | undefined {
-    const pacientes = cargarDatos<Paciente>('pacientes');
-    return pacientes.find(p => p.id_paciente === id);
-}
+console.log(clinic.obtenerTodosLosDoctores()); 
+console.log(clinic.contarDoctores()); 
 
-function obtenerEdadPaciente(id: ID): number | undefined {
-    const paciente = obtenerPacientePorId(id);
-    if (paciente) {
-        const diff = Date.now() - new Date(paciente.fecha_nacimiento).getTime();
-        return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-    }
-    return undefined;
-}
+console.log(clinic.validarDisponibilidadDoctor(1, 'Lunes', '09:00')); 
+console.log(clinic.validarDisponibilidadDoctor(1, 'Martes', '09:00'));
 
-function obtenerTodosLosPacientes(): Paciente[] {
-    return cargarDatos<Paciente>('pacientes');
-}
+clinic.editarDoctor(1, { nombre: 'María García Editada' });
+console.log(clinic.buscarDoctorPorId(1));
 
-function contarPacientes(): number {
-    return cargarDatos<Paciente>('pacientes').length;
-}
+clinic.eliminarDoctor(2);
+console.log(clinic.contarDoctores()); 
 
-function obtenerUltimasRecetasDelPaciente(id: ID): Receta[] {
-    const recetas = cargarDatos<Receta>('recetas');
-    return recetas.filter(r => r.id_paciente === id).slice(-5);
-}
+console.log(clinic.obtenerDoctoresDisponiblesPorDia('Lunes'));
 
-// Gestión de Citas
-function programarCita(cita: Cita): void {
-    const citas = cargarDatos<Cita>('citas');
-    citas.push(cita);
-    guardarDatos('citas', citas);
-}
+//Santi
+// Importación de interfaces
+import { Receta } from './interfaces/receta.interface';
+import { ProductoServicio } from './interfaces/producto_servicio.interface';
+import { Factura } from './interfaces/factura.interface';
+import { Medicamento } from './interfaces/medicamento.interface';
 
-function cancelarCita(fecha_hora: Date, id_paciente: ID, id_doctor: ID): void {
-    const citas = cargarDatos<Cita>('citas');
-    const indice = citas.findIndex(c => c.fecha_hora === fecha_hora && c.id_paciente === id_paciente && c.id_doctor === id_doctor);
-    if (indice !== -1) {
-        citas.splice(indice, 1);
-        guardarDatos('citas', citas);
-    }
-}
+// Variables globales
+let recetas: Receta[] = [];
+let productosServicios: ProductoServicio[] = [];
+let facturas: Factura[] = [];
 
-function reprogramarCita(fecha_hora: Date, id_paciente: ID, id_doctor: ID, nuevaCita: Partial<Cita>): void {
-    const citas = cargarDatos<Cita>('citas');
-    const indice = citas.findIndex(c => c.fecha_hora === fecha_hora && c.id_paciente === id_paciente && c.id_doctor === id_doctor);
-    if (indice !== -1) {
-        citas[indice] = { ...citas[indice], ...nuevaCita };
-        guardarDatos('citas', citas);
-    }
-}
-
-function obtenerCitasPorDoctor(id_doctor: ID): Cita[] {
-    const citas = cargarDatos<Cita>('citas');
-    return citas.filter(c => c.id_doctor === id_doctor);
-}
-
-function obtenerCitasPorPaciente(id_paciente: ID): Cita[] {
-    const citas = cargarDatos<Cita>('citas');
-    return citas.filter(c => c.id_paciente === id_paciente);
-}
-
-function obtenerCitasPorFecha(fecha: Date): Cita[] {
-    const citas = cargarDatos<Cita>('citas');
-    return citas.filter(c => new Date(c.fecha_hora).toDateString() === fecha.toDateString());
-}
-
-// Gestión de Doctores y Horarios
-function crearDoctor(doctor: Doctor): void {
-    const doctores = cargarDatos<Doctor>('doctores');
-    doctores.push(doctor);
-    guardarDatos('doctores', doctores);
-}
-
-function editarDoctor(id: ID, doctorActualizado: Partial<Doctor>): void {
-    const doctores = cargarDatos<Doctor>('doctores');
-    const indice = doctores.findIndex(d => d.id_doctor === id);
-    if (indice !== -1) {
-        doctores[indice] = { ...doctores[indice], ...doctorActualizado };
-        guardarDatos('doctores', doctores);
-    }
-}
-
-function eliminarDoctor(id: ID): void {
-    const doctores = cargarDatos<Doctor>('doctores');
-    const indice = doctores.findIndex(d => d.id_doctor === id);
-    if (indice !== -1) {
-        doctores.splice(indice, 1);
-        guardarDatos('doctores', doctores);
-    }
-}
-
-function obtenerDoctorPorId(id: ID): Doctor | undefined {
-    const doctores = cargarDatos<Doctor>('doctores');
-    return doctores.find(d => d.id_doctor === id);
-}
-
-function obtenerDoctoresDisponiblesPorFecha(fecha: Date): Doctor[] {
-    const doctores = cargarDatos<Doctor>('doctores');
-    return doctores.filter(d => d.horario.some(h => new Date(fecha).toDateString() === h.dia));
-}
-
-function obtenerTodosLosDoctores(): Doctor[] {
-    return cargarDatos<Doctor>('doctores');
-}
-
-function contarDoctores(): number {
-    return cargarDatos<Doctor>('doctores').length;
-}
-
-function validarDisponibilidadDoctor(id: ID, fecha: Date): boolean {
-    const doctor = obtenerDoctorPorId(id);
-    if (doctor) {
-        return doctor.horario.some(h => new Date(fecha).toDateString() === h.dia);
-    }
-    return false;
-}
-
-// Gestión de Recetas
+// Registro de recetas
 function crearReceta(receta: Receta): void {
-    const recetas = cargarDatos<Receta>('recetas');
+    const id_receta = recetas.length + 1;
+    receta.id_receta = id_receta;
     recetas.push(receta);
-    guardarDatos('recetas', recetas);
+    console.log(`Receta creada para el paciente ${receta.id_paciente}`);
 }
 
-function editarReceta(id_paciente: ID, id_doctor: ID, recetaActualizada: Partial<Receta>): void {
-    const recetas = cargarDatos<Receta>('recetas');
-    const indice = recetas.findIndex(r => r.id_paciente === id_paciente && r.id_doctor === id_doctor);
-    if (indice !== -1) {
-        recetas[indice] = { ...recetas[indice], ...recetaActualizada };
-        guardarDatos('recetas', recetas);
+function editarReceta(id_receta: number, nuevaReceta: Receta): void {
+    const index = recetas.findIndex(r => r.id_receta === id_receta);
+    if (index !== -1) {
+        recetas[index] = nuevaReceta;
+        console.log(`Receta editada para el paciente ${nuevaReceta.id_paciente}`);
+    } else {
+        console.log(`Receta con ID ${id_receta} no encontrada`);
     }
 }
 
-function eliminarReceta(id_paciente: ID, id_doctor: ID): void {
-    const recetas = cargarDatos<Receta>('recetas');
-    const indice = recetas.findIndex(r => r.id_paciente === id_paciente && r.id_doctor === id_doctor);
-    if (indice !== -1) {
-        recetas.splice(indice, 1);
-        guardarDatos('recetas', recetas);
-    }
-}
 
-function obtenerRecetasPorPaciente(id_paciente: ID): Receta[] {
-    const recetas = cargarDatos<Receta>('recetas');
+function obtenerRecetasDePaciente(id_paciente: number): Receta[] {
     return recetas.filter(r => r.id_paciente === id_paciente);
 }
 
-function obtenerMedicamentosPorReceta(id_paciente: ID, id_doctor: ID): Medicamento[] | undefined {
-    const recetas = cargarDatos<Receta>('recetas');
-    const receta = recetas.find(r => r.id_paciente === id_paciente && r.id_doctor === id_doctor);
-    return receta ? receta.medicamentos : undefined;
+function obtenerMedicamentosDeReceta(id_receta: number): Medicamento[] {
+    const receta = recetas.find(r => r.id_receta === id_receta);
+    return receta ? receta.medicamentos : [];
 }
 
-// Gestión de Productos y Servicios
-function crearProductoServicio(productoServicio: ProductoServicio): void {
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
-    productosServicios.push(productoServicio);
-    guardarDatos('productos_servicios', productosServicios);
+// Administración de productos y servicios
+function crearProductoServicio(nombre: string, tipo: "Servicio" | "Producto", precio: number): void {
+    const id_producto_servicio = productosServicios.length + 1;
+    const nuevoProductoServicio: ProductoServicio = { id_producto_servicio, nombre, tipo, precio };
+    productosServicios.push(nuevoProductoServicio);
+    console.log(`Producto/Servicio creado: ${nombre}`);
 }
 
-function editarProductoServicio(id: ID, productoServicioActualizado: Partial<ProductoServicio>): void {
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
-    const indice = productosServicios.findIndex(ps => ps.id_producto_servicio === id);
-    if (indice !== -1) {
-        productosServicios[indice] = { ...productosServicios[indice], ...productoServicioActualizado };
-        guardarDatos('productos_servicios', productosServicios);
+function editarProductoServicio(id_producto_servicio: number, nombre: string, tipo: "Servicio" | "Producto", precio: number): void {
+    const index = productosServicios.findIndex(ps => ps.id_producto_servicio === id_producto_servicio);
+    if (index !== -1) {
+        productosServicios[index] = { ...productosServicios[index], nombre, tipo, precio };
+        console.log(`Producto/Servicio editado: ${nombre}`);
+    } else {
+        console.log(`Producto/Servicio con ID ${id_producto_servicio} no encontrado`);
     }
 }
 
-function eliminarProductoServicio(id: ID): void {
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
-    const indice = productosServicios.findIndex(ps => ps.id_producto_servicio === id);
-    if (indice !== -1) {
-        productosServicios.splice(indice, 1);
-        guardarDatos('productos_servicios', productosServicios);
-    }
+
+function obtenerProductoServicioPorId(id_producto_servicio: number): ProductoServicio | undefined {
+    return productosServicios.find(ps => ps.id_producto_servicio === id_producto_servicio);
 }
 
-function obtenerProductoServicioPorId(id: ID): ProductoServicio | undefined {
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
-    return productosServicios.find(ps => ps.id_producto_servicio === id);
-}
-
-function obtenerProductosServiciosPorTipo(tipo: 'Servicio' | 'Producto'): ProductoServicio[] {
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
+function obtenerProductosServiciosPorTipo(tipo: string): ProductoServicio[] {
     return productosServicios.filter(ps => ps.tipo === tipo);
 }
 
-// Gestión de Facturas
-function crearFactura(factura: Factura): void {
-    const facturas = cargarDatos<Factura>('facturas');
-    facturas.push(factura);
-    guardarDatos('facturas', facturas);
+// Facturación de servicios prestados
+function crearFactura(id_paciente: number, servicios_consumidos: ProductoServicio[], total: number): void {
+    const id_factura = facturas.length + 1;
+    const serviciosIds = servicios_consumidos.map(sc => sc.id_producto_servicio);
+    const nuevaFactura: Factura = {
+        id_factura, id_paciente, servicios_consumidos: serviciosIds, total, fecha_hora: new Date(), id_doctor: 0,
+        fecha: undefined
+    };
+    facturas.push(nuevaFactura);
+    console.log(`Factura creada para el paciente ${id_paciente}`);
 }
 
-function editarFactura(id: ID, facturaActualizada: Partial<Factura>): void {
-    const facturas = cargarDatos<Factura>('facturas');
-    const indice = facturas.findIndex(f => f.id_factura === id);
-    if (indice !== -1) {
-        facturas[indice] = { ...facturas[indice], ...facturaActualizada };
-        guardarDatos('facturas', facturas);
+function editarFactura(id_factura: number, nuevosServiciosConsumidos: ProductoServicio[], nuevoTotal: number): void {
+    const index = facturas.findIndex(f => f.id_factura === id_factura);
+    if (index !== -1) {
+        const serviciosIds = nuevosServiciosConsumidos.map(sc => sc.id_producto_servicio);
+        facturas[index].servicios_consumidos = serviciosIds;
+        facturas[index].total = nuevoTotal;
+        console.log(`Factura editada para el paciente ${facturas[index].id_paciente}`);
+    } else {
+        console.log(`Factura con ID ${id_factura} no encontrada`);
     }
 }
 
-function eliminarFactura(id: ID): void {
-    const facturas = cargarDatos<Factura>('facturas');
-    const indice = facturas.findIndex(f => f.id_factura === id);
-    if (indice !== -1) {
-        facturas.splice(indice, 1);
-        guardarDatos('facturas', facturas);
-    }
-}
 
-function obtenerFacturasPorCliente(id_paciente: ID): Factura[] {
-    const facturas = cargarDatos<Factura>('facturas');
+function obtenerFacturasPorCliente(id_paciente: number): Factura[] {
     return facturas.filter(f => f.id_paciente === id_paciente);
 }
 
-function obtenerProductosPorFactura(id_factura: ID): (ProductoServicio | undefined)[] {
-    const facturas = cargarDatos<Factura>('facturas');
-    const productosServicios = cargarDatos<ProductoServicio>('productos_servicios');
+function obtenerProductosPorFactura(id_factura: number): { nombre: string, precio: number }[] {
     const factura = facturas.find(f => f.id_factura === id_factura);
-    return factura ? factura.servicios_consumidos.map(id => productosServicios.find(ps => ps.id_producto_servicio === id)) : [];
+    return factura ? factura.servicios_consumidos.map((value: number, index: number, array: number[]) => {
+        const sc = productosServicios.find(ps => ps.id_producto_servicio === value);
+        return { nombre: sc?.nombre ?? '', precio: sc?.precio ?? 0 };
+    }) : [];
 }
 
 function obtenerFacturasPorFecha(fecha: Date): Factura[] {
-    const facturas = cargarDatos<Factura>('facturas');
-    return facturas.filter(f => new Date(f.fecha_hora).toDateString() === fecha.toDateString());
+    return facturas.filter(f => f.fecha.toDateString() === fecha.toDateString());
 }
 
 function obtenerTotalFacturacionPorMes(mes: number, anio: number): number {
-    const facturas = cargarDatos<Factura>('facturas');
-    return facturas.filter(f => new Date(f.fecha_hora).getMonth() === mes && new Date(f.fecha_hora).getFullYear() === anio).reduce((total, factura) => total + factura.total, 0);
+    return facturas.filter(f => f.fecha.getMonth() === mes && f.fecha.getFullYear() === anio).reduce((total, factura) => total + factura.total, 0);
 }
 
-// Ejemplo de uso
-crearUsuario({
-    id_usuario: 1,
-    nombre: 'Admin',
-    carnet: 12345,
-    correo: 'admin@clinic.com',
-    clave: 'admin123',
-    habilitado: true
-});
+// Funciones de prueba
+function prueba() {
+    // Prueba de registro de recetas
+    crearReceta({ id_receta: 0, id_paciente: 1, id_doctor: 0, medicamentos: [{ nombre: 'Paracetamol', dosis: '500mg', frecuencia_horas: '8 horas', duracion_dias: '3 días' }] });
+    editarReceta(1, {
+        id_receta: 1, id_paciente: 1, medicamentos: [{
+            nombre: 'Ibuprofeno', dosis: '400mg',
+            frecuencia_horas: '',
+            duracion_dias: ''
+        }],
+        id_doctor: 0
+    });
+    console.log(obtenerRecetasDePaciente(1));
+    console.log(obtenerMedicamentosDeReceta(1));
 
-const usuario = autenticarUsuario('admin@clinic.com', 'admin123');
-if (usuario) {
-    console.log('Usuario autenticado:', usuario);
-} else {
-    console.log('Fallo en la autenticación');
+    // Prueba de administración de productos y servicios
+    crearProductoServicio('Limpieza dental', 'Servicio', 50);
+    editarProductoServicio(1, 'Limpieza dental', 'Servicio', 60);
+    console.log(obtenerProductoServicioPorId(1));
+    console.log(obtenerProductosServiciosPorTipo('Servicio'));
+
+    // Prueba de facturación de servicios prestados
+    crearFactura(1, [{ id_producto_servicio: 1, nombre: 'Limpieza dental', tipo: 'Servicio', precio: 60 }], 60);
+    editarFactura(1, [{ id_producto_servicio: 1, nombre: 'Limpieza dental', tipo: 'Servicio', precio: 60 }], 70);
+    console.log(obtenerFacturasPorCliente(1));
+    console.log(obtenerProductosPorFactura(1));
+    console.log(obtenerFacturasPorFecha(new Date(2024, 5, 10)));
+    console.log(obtenerTotalFacturacionPorMes(5, 2024));
 }
+
+// Prueba
+prueba();
+
+// Guardar datos al finalizar la ejecución
+
+function guardarDatos(usuarios: any[], pacientes: any[], citas: any[], doctores: any[], recetas: Receta[], productosServicios: ProductoServicio[], facturas: Factura[]) {
+    // Implementación de guardado de datos (simulación)
+    console.log('Datos guardados');
+}
+
+process.on('exit', () => guardarDatos([], [], [], [], recetas, productosServicios, facturas));
